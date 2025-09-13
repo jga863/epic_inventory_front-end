@@ -33,3 +33,7 @@ export const searchByOffice = (office, { page = 0, size = 12, sort = 'updatedAt,
 // Por prioridad de reemplazo
 export const getByReplacePriority = (priority) =>
   apiClient.get(`/computers/by-priority/${priority}`);
+
+// Obtener resumen de computadora con empleado asignado
+export const getComputerSummary = (id) =>
+  apiClient.get(`/summary/computer/${id}`);

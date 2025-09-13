@@ -6,7 +6,7 @@ import { listEmployeesPage } from "../services/employeeApi";
 import epicComputer from "../assets/epic_computer.png";
 import epicEmployee from "../assets/epic_employee.png";
 
-const InventoryGrid = ({ category = "Computers" }) => {
+const InventoryGrid = ({ category = "Computers", onEmployeeClick, onComputerClick }) => {
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(0);
   const size = 12;
@@ -37,6 +37,12 @@ const InventoryGrid = ({ category = "Computers" }) => {
               id: c.id,
               name: c.name,
               model: c.model,
+              office: c.office,
+              division: c.division,
+              serialNo: c.serialNo,
+              ram: c.ram,
+              processor: c.processor,
+              os: c.os,
             }))
           );
           setTotalPages(resp?.totalPages ?? 0);
@@ -45,6 +51,13 @@ const InventoryGrid = ({ category = "Computers" }) => {
           setItems(
             (resp?.content || []).map((e) => ({
               id: e.id,
+              fullName: e.fullName,
+              email: e.email,
+              office: e.office,
+              department: e.department,
+              role: e.role,
+              status: e.status,
+              // Keep these for backward compatibility with the card display
               name: e.fullName,
               model: e.department,
             }))
@@ -82,6 +95,16 @@ const InventoryGrid = ({ category = "Computers" }) => {
             name={item.name}
             model={item.model}
             image={imageMap[category]}
+            onClick={() => {
+              // Manejar clicks para empleados
+              if (category === "Employee" && onEmployeeClick) {
+                onEmployeeClick(item);
+              }
+              // Manejar clicks para computadoras
+              if (category === "Computers" && onComputerClick) {
+                onComputerClick(item);
+              }
+            }}
           />
         ))}
       </div>

@@ -12,6 +12,14 @@ export const listEmployeesPage = ({
     params: { page, size, search, office },
   });
 
+// Obtener empleado específico por ID
+export const getEmployeeById = (id) =>
+  apiClient.get(`/employees/${id}`);
+
+// Obtener resumen de empleado con computadora asignada
+export const getEmployeeSummary = (id) =>
+  apiClient.get(`/summary/${id}`);
+
 // Lista completa (no paginada)
 // Trae todos los empleados recorriendo todas las páginas
 export const listAllEmployees = async () => {
