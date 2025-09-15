@@ -9,11 +9,11 @@ import {
 } from "react-icons/fa";
 import SidebarButton from "./SidebarButton";
 
-const Sidebar = () => {
+const Sidebar = ({ onToggleSearch }) => {
   return (
     <aside className="fixed left-0 top-0 z-50 h-screen w-20 bg-white flex flex-col items-center py-4 shadow-lg">
       {/* Hamburger Menu */}
-      <button className="mb-6 text-2xl text-gray-600 hover:text-purple-600">
+      <button className="mb-6 text-2xl text-gray-600 hover:text-purple-600" type="button">
         <FaBars />
       </button>
 
@@ -30,7 +30,7 @@ const Sidebar = () => {
       {/* Navigation Buttons */}
       <nav className="flex flex-col gap-4 w-full items-center">
         <SidebarButton icon={<FaPlus />} label="Add" />
-        <SidebarButton icon={<FaSearch />} label="Find" />
+        <SidebarButton icon={<FaSearch />} label="Find" onClick={() => onToggleSearch?.()} />
         <SidebarButton icon={<FaEdit />} label="Update" />
         <SidebarButton icon={<FaTrash />} label="Delete" />
         <SidebarButton icon={<FaChartBar />} label="Reports" />
