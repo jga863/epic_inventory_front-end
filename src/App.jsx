@@ -1,10 +1,21 @@
-import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import FilterBar from "./components/FilterBar";
 import InventoryGrid from "./components/InventoryGrid";
 import EmployeeProfile from "./components/EmployeeProfile";
 import ComputerProfile from "./components/ComputerProfile";
+import AddEmployeeModal from "./components/AddEmployeeModal";
+import AddComputerForm from "./components/AddComputerForm";
+import employeeChoiceIllustration from "./assets/epic_employee.png";
+import computerChoiceIllustration from "./assets/epic_computer.png";
+
+const ADD_VIEWS = {
+  NONE: "none",
+  SELECTOR: "selector",
+  EMPLOYEE: "employee",
+  COMPUTER: "computer",
+};
 
 function App() {
   const [selected, setSelected] = useState("Computers");
@@ -13,8 +24,13 @@ function App() {
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [addView, setAddView] = useState(ADD_VIEWS.NONE);
+  const [newEmployeeEvent, setNewEmployeeEvent] = useState(null);
+  const [newComputerEvent, setNewComputerEvent] = useState(null);
+  const [toast, setToast] = useState(null);
 
   const handleToggleSearch = () => {
+    setAddView(ADD_VIEWS.NONE);
     setIsSearchVisible((prev) => {
       const next = !prev;
       if (next) {
@@ -41,20 +57,88 @@ function App() {
     handleSearchClear();
   };
 
-  // Funcion para manejar el click en un empleado
+  const openAddSelector = () => {
+    setSelectedEmployee(null);
+    setSelectedComputer(null);
+    setAddView((current) =>
+      current === ADD_VIEWS.SELECTOR ? ADD_VIEWS.NONE : ADD_VIEWS.SELECTOR
+    );
+  };
+
+  const handleSelectAdd = (type) => {
+    if (type === ADD_VIEWS.EMPLOYEE) {
+      setSelected("Employee");
+      setAddView(ADD_VIEWS.EMPLOYEE);
+    } else if (type === ADD_VIEWS.COMPUTER) {
+      setSelected("Computers");
+      setAddView(ADD_VIEWS.COMPUTER);
+    }
+    setSelectedEmployee(null);
+    setSelectedComputer(null);
+  };
+
+  const closeAddView = () => {
+    setAddView(ADD_VIEWS.NONE);
+  };
+
+  const handleEmployeeCreated = (employee) => {
+    const displayName =
+      employee?.fullName ||
+      [employee?.firstName, employee?.lastName].filter(Boolean).join(" ");
+    setSelected("Employee");
+    setAddView(ADD_VIEWS.NONE);
+    setNewEmployeeEvent({ employee, ts: Date.now() });
+    setToast({
+      id: Date.now(),
+      type: "success",
+      message: displayName
+        ? `${displayName} added successfully.`
+        : "Employee added successfully.",
+    });
+  };
+
+  const handleComputerCreated = (computer) => {
+    setSelected("Computers");
+    setAddView(ADD_VIEWS.NONE);
+    setNewComputerEvent({ computer, ts: Date.now() });
+    setToast({
+      id: Date.now(),
+      type: "success",
+      message: computer?.name
+        ? `${computer.name} added successfully.`
+        : "Computer added successfully.",
+    });
+  };
+
+  useEffect(() => {
+    if (!toast) {
+      return undefined;
+    }
+    const timer = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
   const handleEmployeeClick = (employee) => {
-    setSelectedEmployee(employee.id); // Solo pasar el ID
-    setSelectedComputer(null); // Clear computer selection
+    setAddView(ADD_VIEWS.NONE);
+    setSelectedEmployee(employee.id);
+    setSelectedComputer(null);
   };
 
-  // Funcion para manejar el click en una computadora
   const handleComputerClick = (computer) => {
-    setSelectedComputer(computer.id); // Solo pasar el ID
-    setSelectedEmployee(null); // Clear employee selection
+    setAddView(ADD_VIEWS.NONE);
+    setSelectedComputer(computer.id);
+    setSelectedEmployee(null);
   };
 
-  // Funcion para volver a la lista
   const handleBackToList = () => {
+    setSelectedEmployee(null);
+    setSelectedComputer(null);
+    setAddView(ADD_VIEWS.NONE);
+  };
+
+  const handleFilterSelect = (value) => {
+    setSelected(value);
+    setAddView(ADD_VIEWS.NONE);
     setSelectedEmployee(null);
     setSelectedComputer(null);
   };
@@ -64,60 +148,118 @@ function App() {
       ? "Search employee by name"
       : "Search computer by name";
 
-  // Si hay un empleado seleccionado, mostrar su perfil
-  if (selectedEmployee) {
-    return (
-      <div className="flex min-h-screen bg-white">
-        <Sidebar onToggleSearch={handleToggleSearch} />
-        <main className="flex-1 ml-20">
-          <Header />
-          <EmployeeProfile
-            employeeId={selectedEmployee}
-            onBack={handleBackToList}
-          />
-        </main>
+  const toastNode = toast ? (
+    <div className="fixed top-6 right-6 z-50 rounded bg-green-100 px-4 py-2 text-sm font-medium text-green-800 shadow">
+      {toast.message}
+    </div>
+  ) : null;
+
+  let mainContent = null;
+  if (addView === ADD_VIEWS.SELECTOR) {
+    mainContent = (
+      <div className="flex h-full w-full items-center justify-center px-4 py-12">
+        <div className="relative w-full max-w-3xl rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
+          <div className="absolute -left-6 top-1/2 hidden h-28 w-5 -translate-y-1/2 rounded-r-3xl border border-gray-200 bg-white lg:block" />
+          <div className="absolute -right-6 top-1/2 hidden h-28 w-5 -translate-y-1/2 rounded-l-3xl border border-gray-200 bg-white lg:block" />
+          <div className="rounded-2xl border border-gray-100 bg-gray-50 px-10 py-8 mb-50">
+            <h2 className="text-center text-lg font-semibold text-gray-800">What would you like to add?</h2>
+            <p className="mt-2 text-center text-sm text-gray-500">Please select the correct form</p>
+            <div className="mt-8 grid gap-6 md:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => handleSelectAdd(ADD_VIEWS.EMPLOYEE)}
+                className="group flex h-full flex-col items-center rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:border-yellow-400 hover:shadow-lg"
+              >
+                <span className="text-sm font-semibold text-yellow-700 group-hover:text-yellow-800">New Employee</span>
+                <div className="mt-4 flex h-32 w-full items-center justify-center rounded-xl bg-gray-100">
+                  <img src={employeeChoiceIllustration} alt="Add employee" className="h-24 object-contain" />
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleSelectAdd(ADD_VIEWS.COMPUTER)}
+                className="group flex h-full flex-col items-center rounded-2xl border border-gray-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:border-yellow-400 hover:shadow-lg"
+              >
+                <span className="text-sm font-semibold text-yellow-700 group-hover:text-yellow-800">New computer</span>
+                <div className="mt-4 flex h-32 w-full items-center justify-center rounded-xl bg-gray-100">
+                  <img src={computerChoiceIllustration} alt="Add computer" className="h-24 object-contain" />
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
-  }
 
-  // Si hay una computadora seleccionada, mostrar su perfil
-  if (selectedComputer) {
-    return (
-      <div className="flex min-h-screen bg-white">
-        <Sidebar onToggleSearch={handleToggleSearch} />
-        <main className="flex-1 ml-20">
-          <Header />
-          <ComputerProfile
-            computerId={selectedComputer}
-            onBack={handleBackToList}
-          />
-        </main>
+  } else if (addView === ADD_VIEWS.EMPLOYEE) {
+    mainContent = (
+      <AddEmployeeModal
+        isOpen
+        onClose={closeAddView}
+        onSuccess={handleEmployeeCreated}
+      />
+    );
+  } else if (addView === ADD_VIEWS.COMPUTER) {
+    mainContent = (
+      <AddComputerForm isOpen onClose={closeAddView} onSuccess={handleComputerCreated} />
+    );
+  } else if (selectedEmployee) {
+    mainContent = (
+      <div className="flex-1">
+        <EmployeeProfile employeeId={selectedEmployee} onBack={handleBackToList} />
       </div>
+    );
+  } else if (selectedComputer) {
+    mainContent = (
+      <div className="flex-1">
+        <ComputerProfile computerId={selectedComputer} onBack={handleBackToList} />
+      </div>
+    );
+  } else {
+    mainContent = (
+      <InventoryGrid
+        category={selected}
+        searchTerm={searchTerm}
+        isSearchVisible={isSearchVisible}
+        searchInput={searchInput}
+        onSearchInputChange={setSearchInput}
+        onSearchSubmit={handleSearchSubmit}
+        onSearchClear={handleSearchClear}
+        onSearchClose={handleCloseSearch}
+        searchPlaceholder={searchPlaceholder}
+        onEmployeeClick={handleEmployeeClick}
+        onComputerClick={handleComputerClick}
+        newEmployeeEvent={newEmployeeEvent}
+        newComputerEvent={newComputerEvent}
+      />
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-white">
-      <Sidebar onToggleSearch={handleToggleSearch} />
-      <main className="flex-1 ml-20">
-        <Header />
-        <FilterBar selected={selected} onSelect={setSelected} />
-        <InventoryGrid
-          category={selected}
-          searchTerm={searchTerm}
-          isSearchVisible={isSearchVisible}
-          searchInput={searchInput}
-          onSearchInputChange={setSearchInput}
-          onSearchSubmit={handleSearchSubmit}
-          onSearchClear={handleSearchClear}
-          onSearchClose={handleCloseSearch}
-          searchPlaceholder={searchPlaceholder}
-          onEmployeeClick={handleEmployeeClick}
-          onComputerClick={handleComputerClick}
-        />
-      </main>
-    </div>
+    <>
+      <div className="flex min-h-screen bg-white">
+        <Sidebar onToggleSearch={handleToggleSearch} onAddClick={openAddSelector} />
+        <main className="flex-1 ml-20 flex flex-col">
+          <Header />
+          <FilterBar selected={selected} onSelect={handleFilterSelect} />
+          <div className="flex-1 overflow-auto">
+            {mainContent}
+          </div>
+        </main>
+      </div>
+      {toastNode}
+    </>
   );
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+

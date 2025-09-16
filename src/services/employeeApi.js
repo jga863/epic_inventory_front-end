@@ -1,4 +1,4 @@
-import { apiClient } from './apiClient';
+import { apiClient } from "./apiClient";
 
 // Lista paginada: /api/employees
 // Backend acepta ?page, ?size, ?search, ?office
@@ -8,23 +8,25 @@ export const listEmployeesPage = ({
   search,
   office,
 } = {}) =>
-  apiClient.get('/employees', {
+  apiClient.get("/employees", {
     params: { page, size, search, office },
   });
 
-// Obtener empleado específico por ID
-export const getEmployeeById = (id) =>
-  apiClient.get(`/employees/${id}`);
+// Obtener empleado especifico por ID
+export const getEmployeeById = (id) => apiClient.get(`/employees/${id}`);
 
 // Obtener resumen de empleado con computadora asignada
-export const getEmployeeSummary = (id) =>
-  apiClient.get(`/summary/${id}`);
+export const getEmployeeSummary = (id) => apiClient.get(`/summary/${id}`);
+
+// Crear un empleado
+export const createEmployee = (employee) =>
+  apiClient.post("/employees", employee);
 
 // Lista completa (no paginada)
-// Trae todos los empleados recorriendo todas las páginas
+// Trae todos los empleados recorriendo todas las paginas
 export const listAllEmployees = async () => {
   let page = 0;
-  const size = 100; // límite razonable por request
+  const size = 100; // limite razonable por request
   let all = [];
   let done = false;
 
@@ -33,7 +35,7 @@ export const listAllEmployees = async () => {
     if (resp?.content?.length) {
       all = [...all, ...resp.content];
       page++;
-      done = resp.last === true; // backend dice si es la última página
+      done = resp.last === true; // backend indica si es la ultima pagina
     } else {
       done = true;
     }

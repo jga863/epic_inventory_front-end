@@ -9,6 +9,42 @@ import epicEmployee from "../assets/epic_employee.png";
 
 const PAGE_SIZE = 12;
 
+const mapEmployeeToGridItem = (employee) => {
+  if (!employee) {
+    return null;
+  }
+  const fullName =
+    employee.fullName || [employee.firstName, employee.lastName].filter(Boolean).join(" ");
+  return {
+    id: employee.id,
+    fullName,
+    email: employee.email,
+    office: employee.office,
+    department: employee.department,
+    role: employee.role,
+    status: employee.status,
+    name: fullName || employee.name,
+    model: employee.department,
+  };
+};
+
+const mapComputerToGridItem = (computer) => {
+  if (!computer) {
+    return null;
+  }
+  return {
+    id: computer.id,
+    name: computer.name,
+    model: computer.model,
+    office: computer.office,
+    division: computer.division,
+    serialNo: computer.serialNo,
+    ram: computer.ram,
+    processor: computer.processor,
+    os: computer.os,
+  };
+};
+
 const InventoryGrid = ({
   category = "Computers",
   onEmployeeClick,
@@ -21,6 +57,8 @@ const InventoryGrid = ({
   onSearchClear,
   onSearchClose,
   searchPlaceholder,
+  newEmployeeEvent,
+  newComputerEvent,
 }) => {
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(0);
@@ -30,6 +68,8 @@ const InventoryGrid = ({
   const previousCategory = useRef(category);
   const previousSearch = useRef((searchTerm || "").trim());
   const requestCounter = useRef(0);
+  const lastAddEmployee = useRef(null);
+  const lastAddComputer = useRef(null);
 
   const normalizedSearch = (searchTerm || "").trim();
 
@@ -69,19 +109,7 @@ const InventoryGrid = ({
             ? await searchComputers({ name: normalizedSearch, page, size: PAGE_SIZE })
             : await listComputersPage({ page, size: PAGE_SIZE });
           if (!cancelled && requestCounter.current === requestId) {
-            setItems(
-              (response?.content || []).map((c) => ({
-                id: c.id,
-                name: c.name,
-                model: c.model,
-                office: c.office,
-                division: c.division,
-                serialNo: c.serialNo,
-                ram: c.ram,
-                processor: c.processor,
-                os: c.os,
-              }))
-            );
+            setItems((response?.content || []).map(mapComputerToGridItem).filter(Boolean));
             setTotalPages(response?.totalPages ?? 0);
           }
         } else if (category === "Employee") {
@@ -91,19 +119,7 @@ const InventoryGrid = ({
             search: normalizedSearch || undefined,
           });
           if (!cancelled && requestCounter.current === requestId) {
-            setItems(
-              (response?.content || []).map((e) => ({
-                id: e.id,
-                fullName: e.fullName,
-                email: e.email,
-                office: e.office,
-                department: e.department,
-                role: e.role,
-                status: e.status,
-                name: e.fullName,
-                model: e.department,
-              }))
-            );
+            setItems((response?.content || []).map(mapEmployeeToGridItem).filter(Boolean));
             setTotalPages(response?.totalPages ?? 0);
           }
         } else {
@@ -131,6 +147,69 @@ const InventoryGrid = ({
       cancelled = true;
     };
   }, [category, normalizedSearch, page]);
+
+  useEffect(() => {
+    if (!newEmployeeEvent || category !== "Employee") {
+      return;
+    }
+    if (lastAddEmployee.current === newEmployeeEvent.ts) {
+      return;
+    }
+    lastAddEmployee.current = newEmployeeEvent.ts;
+    const mapped = mapEmployeeToGridItem(newEmployeeEvent.employee);
+    if (!mapped) {
+      return;
+    }
+    const normalized = normalizedSearch.toLowerCase();
+    if (normalized) {
+      const nameMatch = mapped.name?.toLowerCase().includes(normalized);
+      const emailMatch = mapped.email?.toLowerCase().includes(normalized);
+      if (!nameMatch && !emailMatch) {
+        return;
+      }
+    }
+    setItems((prev) => {
+      const alreadyPresent = prev.some((item) => item.id === mapped.id);
+      if (alreadyPresent) {
+        return prev;
+      }
+      const next = [mapped, ...prev];
+      return next.length > PAGE_SIZE ? next.slice(0, PAGE_SIZE) : next;
+    });
+    setTotalPages((prev) => (prev === 0 ? 1 : prev));
+  }, [newEmployeeEvent, category, normalizedSearch]);
+
+  useEffect(() => {
+    if (!newComputerEvent || category !== "Computers") {
+      return;
+    }
+    if (lastAddComputer.current === newComputerEvent.ts) {
+      return;
+    }
+    lastAddComputer.current = newComputerEvent.ts;
+    const mapped = mapComputerToGridItem(newComputerEvent.computer);
+    if (!mapped) {
+      return;
+    }
+    const normalized = normalizedSearch.toLowerCase();
+    if (normalized) {
+      const nameMatch = mapped.name?.toLowerCase().includes(normalized);
+      const modelMatch = mapped.model?.toLowerCase().includes(normalized);
+      const serialMatch = mapped.serialNo?.toLowerCase().includes(normalized);
+      if (!nameMatch && !modelMatch && !serialMatch) {
+        return;
+      }
+    }
+    setItems((prev) => {
+      const alreadyPresent = prev.some((item) => item.id === mapped.id);
+      if (alreadyPresent) {
+        return prev;
+      }
+      const next = [mapped, ...prev];
+      return next.length > PAGE_SIZE ? next.slice(0, PAGE_SIZE) : next;
+    });
+    setTotalPages((prev) => (prev === 0 ? 1 : prev));
+  }, [newComputerEvent, category, normalizedSearch]);
 
   const topBarClass = isSearchVisible
     ? "mb-3 flex items-stretch gap-4"
@@ -164,13 +243,13 @@ const InventoryGrid = ({
 
       {loading ? (
         <div className="py-12 text-center text-sm text-gray-500">
-          Cargando resultados...
+          Loading results...
         </div>
       ) : items.length === 0 ? (
         <div className="py-12 text-center text-sm text-gray-500">
           {normalizedSearch
-            ? `No se encontraron resultados para "${normalizedSearch}".`
-            : "No hay elementos para mostrar."}
+            ? `No results found for "${normalizedSearch}".`
+            : "No items to display."}
         </div>
       ) : (
         <div className="grid grid-cols-4 gap-4">
@@ -198,3 +277,4 @@ const InventoryGrid = ({
 };
 
 export default InventoryGrid;
+
