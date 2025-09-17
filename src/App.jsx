@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
 import FilterBar from "./components/FilterBar";
@@ -7,6 +7,7 @@ import EmployeeProfile from "./components/EmployeeProfile";
 import ComputerProfile from "./components/ComputerProfile";
 import AddEmployeeModal from "./components/AddEmployeeModal";
 import AddComputerForm from "./components/AddComputerForm";
+import AssignPanel from "./components/AssignPanel";
 import employeeChoiceIllustration from "./assets/epic_employee.png";
 import computerChoiceIllustration from "./assets/epic_computer.png";
 
@@ -15,6 +16,7 @@ const ADD_VIEWS = {
   SELECTOR: "selector",
   EMPLOYEE: "employee",
   COMPUTER: "computer",
+  ASSIGN: "assign",
 };
 
 function App() {
@@ -77,8 +79,26 @@ function App() {
     setSelectedComputer(null);
   };
 
+  const handleOpenAssign = () => {
+    setSelectedEmployee(null);
+    setSelectedComputer(null);
+    setAddView(ADD_VIEWS.ASSIGN);
+  };
+
   const closeAddView = () => {
     setAddView(ADD_VIEWS.NONE);
+  };
+
+  const returnToSelector = () => {
+    setAddView(ADD_VIEWS.SELECTOR);
+  };
+
+  const handleAssignmentCreated = () => {
+    setToast({
+      id: Date.now(),
+      type: "success",
+      message: "Assignment created successfully.",
+    });
   };
 
   const handleEmployeeCreated = (employee) => {
@@ -161,7 +181,7 @@ function App() {
         <div className="relative w-full max-w-3xl rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
           <div className="absolute -left-6 top-1/2 hidden h-28 w-5 -translate-y-1/2 rounded-r-3xl border border-gray-200 bg-white lg:block" />
           <div className="absolute -right-6 top-1/2 hidden h-28 w-5 -translate-y-1/2 rounded-l-3xl border border-gray-200 bg-white lg:block" />
-          <div className="rounded-2xl border border-gray-100 bg-gray-50 px-10 py-8 mb-50">
+          <div className="rounded-2xl border border-gray-100 bg-gray-50 px-10 py-8">
             <h2 className="text-center text-lg font-semibold text-gray-800">What would you like to add?</h2>
             <p className="mt-2 text-center text-sm text-gray-500">Please select the correct form</p>
             <div className="mt-8 grid gap-6 md:grid-cols-2">
@@ -186,11 +206,19 @@ function App() {
                 </div>
               </button>
             </div>
+            <div className="mt-10 flex justify-center">
+              <button
+                type="button"
+                onClick={handleOpenAssign}
+                className="flex min-w-[260px] items-center justify-center rounded-full border border-yellow-400 bg-white px-8 py-4 text-base font-semibold text-yellow-700 shadow-sm transition hover:-translate-y-0.5 hover:bg-yellow-50"
+              >
+                Assign computer to an employee
+              </button>
+            </div>
           </div>
         </div>
       </div>
     );
-
   } else if (addView === ADD_VIEWS.EMPLOYEE) {
     mainContent = (
       <AddEmployeeModal
@@ -203,16 +231,29 @@ function App() {
     mainContent = (
       <AddComputerForm isOpen onClose={closeAddView} onSuccess={handleComputerCreated} />
     );
+  } else if (addView === ADD_VIEWS.ASSIGN) {
+    mainContent = (
+      <AssignPanel
+        onClose={returnToSelector}
+        onAssignmentCreated={handleAssignmentCreated}
+      />
+    );
   } else if (selectedEmployee) {
     mainContent = (
       <div className="flex-1">
-        <EmployeeProfile employeeId={selectedEmployee} onBack={handleBackToList} />
+        <EmployeeProfile
+          employeeId={selectedEmployee}
+          onBack={handleBackToList}
+        />
       </div>
     );
   } else if (selectedComputer) {
     mainContent = (
       <div className="flex-1">
-        <ComputerProfile computerId={selectedComputer} onBack={handleBackToList} />
+        <ComputerProfile
+          computerId={selectedComputer}
+          onBack={handleBackToList}
+        />
       </div>
     );
   } else {
@@ -253,13 +294,3 @@ function App() {
 }
 
 export default App;
-
-
-
-
-
-
-
-
-
-
