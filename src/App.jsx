@@ -315,7 +315,7 @@ function App() {
         <div className="relative w-full max-w-3xl rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
           <div className="absolute -left-6 top-1/2 hidden h-28 w-5 -translate-y-1/2 rounded-r-3xl border border-gray-200 bg-white lg:block" />
           <div className="absolute -right-6 top-1/2 hidden h-28 w-5 -translate-y-1/2 rounded-l-3xl border border-gray-200 bg-white lg:block" />
-          <div className="rounded-2xl border border-gray-100 bg-gray-50 px-10 py-8">
+          <div className="rounded-2xl border border-gray-100 bg-gray-50 px-10 py-8 text-center">
             <span className="text-xs font-semibold uppercase tracking-[0.6em] text-yellow-500">
               Add
             </span>
@@ -435,7 +435,6 @@ function App() {
 }
 
 export default App;
-
 
 
 
