@@ -12,6 +12,8 @@ import UpdateSelector from "./components/UpdateSelector";
 import UpdateEmployeePanel from "./components/UpdateEmployeePanel";
 import UpdateComputerPanel from "./components/UpdateComputerPanel";
 import UpdateAssignmentPanel from "./components/UpdateAssignmentPanel";
+import DeleteSelector from "./components/DeleteSelector";
+import DeletePlaceholder from "./components/DeletePlaceholder";
 import employeeChoiceIllustration from "./assets/epic_employee.png";
 import computerChoiceIllustration from "./assets/epic_computer.png";
 
@@ -31,6 +33,13 @@ const UPDATE_VIEWS = {
   ASSIGNMENT: "assignment",
 };
 
+const DELETE_VIEWS = {
+  NONE: "none",
+  SELECTOR: "selector",
+  EMPLOYEE: "employee",
+  COMPUTER: "computer",
+};
+
 function App() {
   const [selected, setSelected] = useState("Computers");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -40,6 +49,7 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [addView, setAddView] = useState(ADD_VIEWS.NONE);
   const [updateView, setUpdateView] = useState(UPDATE_VIEWS.NONE);
+  const [deleteView, setDeleteView] = useState(DELETE_VIEWS.NONE);
   const [newEmployeeEvent, setNewEmployeeEvent] = useState(null);
   const [newComputerEvent, setNewComputerEvent] = useState(null);
   const [toast, setToast] = useState(null);
@@ -52,6 +62,7 @@ function App() {
   const handleToggleSearch = () => {
     setAddView(ADD_VIEWS.NONE);
     setUpdateView(UPDATE_VIEWS.NONE);
+    setDeleteView(DELETE_VIEWS.NONE);
     setIsSearchVisible((prev) => {
       const next = !prev;
       if (next) {
@@ -81,6 +92,7 @@ function App() {
   const openAddSelector = () => {
     resetSelections();
     setUpdateView(UPDATE_VIEWS.NONE);
+    setDeleteView(DELETE_VIEWS.NONE);
     setAddView((current) =>
       current === ADD_VIEWS.SELECTOR ? ADD_VIEWS.NONE : ADD_VIEWS.SELECTOR
     );
@@ -126,6 +138,7 @@ function App() {
   const openUpdateSelector = () => {
     resetSelections();
     setAddView(ADD_VIEWS.NONE);
+    setDeleteView(DELETE_VIEWS.NONE);
     setUpdateView((current) =>
       current === UPDATE_VIEWS.SELECTOR ? UPDATE_VIEWS.NONE : UPDATE_VIEWS.SELECTOR
     );
@@ -150,6 +163,31 @@ function App() {
   const returnToUpdateSelector = () => {
     resetSelections();
     setUpdateView(UPDATE_VIEWS.SELECTOR);
+  };
+
+  const openDeleteSelector = () => {
+    resetSelections();
+    setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
+    setDeleteView((current) =>
+      current === DELETE_VIEWS.SELECTOR ? DELETE_VIEWS.NONE : DELETE_VIEWS.SELECTOR
+    );
+  };
+
+  const handleSelectDelete = (type) => {
+    resetSelections();
+    setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
+    setDeleteView(type);
+  };
+
+  const closeDeleteView = () => {
+    setDeleteView(DELETE_VIEWS.NONE);
+  };
+
+  const returnToDeleteSelector = () => {
+    resetSelections();
+    setDeleteView(DELETE_VIEWS.SELECTOR);
   };
 
   const handleEmployeeCreated = (employee) => {
@@ -243,6 +281,7 @@ function App() {
   const handleEmployeeClick = (employee) => {
     setAddView(ADD_VIEWS.NONE);
     setUpdateView(UPDATE_VIEWS.NONE);
+    setDeleteView(DELETE_VIEWS.NONE);
     setSelectedEmployee(employee.id);
     setSelectedComputer(null);
   };
@@ -250,6 +289,7 @@ function App() {
   const handleComputerClick = (computer) => {
     setAddView(ADD_VIEWS.NONE);
     setUpdateView(UPDATE_VIEWS.NONE);
+    setDeleteView(DELETE_VIEWS.NONE);
     setSelectedComputer(computer.id);
     setSelectedEmployee(null);
   };
@@ -258,6 +298,7 @@ function App() {
     resetSelections();
     setAddView(ADD_VIEWS.NONE);
     setUpdateView(UPDATE_VIEWS.NONE);
+    setDeleteView(DELETE_VIEWS.NONE);
   };
 
   const handleFilterSelect = (value) => {
@@ -265,6 +306,7 @@ function App() {
     resetSelections();
     setAddView(ADD_VIEWS.NONE);
     setUpdateView(UPDATE_VIEWS.NONE);
+    setDeleteView(DELETE_VIEWS.NONE);
   };
 
   const searchPlaceholder =
@@ -307,6 +349,29 @@ function App() {
       <UpdateAssignmentPanel
         onBack={returnToUpdateSelector}
         onSuccess={handleAssignmentUpdated}
+      />
+    );
+  } else if (deleteView === DELETE_VIEWS.SELECTOR) {
+    mainContent = (
+      <DeleteSelector
+        onSelectEmployee={() => handleSelectDelete(DELETE_VIEWS.EMPLOYEE)}
+        onSelectComputer={() => handleSelectDelete(DELETE_VIEWS.COMPUTER)}
+      />
+    );
+  } else if (deleteView === DELETE_VIEWS.EMPLOYEE) {
+    mainContent = (
+      <DeletePlaceholder
+        title="Delete Employee"
+        description="Select an employee to delete from the system."
+        onBack={returnToDeleteSelector}
+      />
+    );
+  } else if (deleteView === DELETE_VIEWS.COMPUTER) {
+    mainContent = (
+      <DeletePlaceholder
+        title="Delete Computer"
+        description="Select a computer to delete from the system."
+        onBack={returnToDeleteSelector}
       />
     );
   } else if (addView === ADD_VIEWS.SELECTOR) {
@@ -420,6 +485,7 @@ function App() {
           onToggleSearch={handleToggleSearch}
           onAddClick={openAddSelector}
           onUpdateClick={openUpdateSelector}
+          onDeleteClick={openDeleteSelector}
         />
         <main className="flex-1 ml-20 flex flex-col">
           <Header />
