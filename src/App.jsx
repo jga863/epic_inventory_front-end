@@ -8,6 +8,10 @@ import ComputerProfile from "./components/ComputerProfile";
 import AddEmployeeModal from "./components/AddEmployeeModal";
 import AddComputerForm from "./components/AddComputerForm";
 import AssignPanel from "./components/AssignPanel";
+import UpdateSelector from "./components/UpdateSelector";
+import UpdateEmployeePanel from "./components/UpdateEmployeePanel";
+import UpdateComputerPanel from "./components/UpdateComputerPanel";
+import UpdateAssignmentPanel from "./components/UpdateAssignmentPanel";
 import employeeChoiceIllustration from "./assets/epic_employee.png";
 import computerChoiceIllustration from "./assets/epic_computer.png";
 
@@ -19,6 +23,14 @@ const ADD_VIEWS = {
   ASSIGN: "assign",
 };
 
+const UPDATE_VIEWS = {
+  NONE: "none",
+  SELECTOR: "selector",
+  EMPLOYEE: "employee",
+  COMPUTER: "computer",
+  ASSIGNMENT: "assignment",
+};
+
 function App() {
   const [selected, setSelected] = useState("Computers");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -27,12 +39,19 @@ function App() {
   const [searchInput, setSearchInput] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [addView, setAddView] = useState(ADD_VIEWS.NONE);
+  const [updateView, setUpdateView] = useState(UPDATE_VIEWS.NONE);
   const [newEmployeeEvent, setNewEmployeeEvent] = useState(null);
   const [newComputerEvent, setNewComputerEvent] = useState(null);
   const [toast, setToast] = useState(null);
 
+  const resetSelections = () => {
+    setSelectedEmployee(null);
+    setSelectedComputer(null);
+  };
+
   const handleToggleSearch = () => {
     setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
     setIsSearchVisible((prev) => {
       const next = !prev;
       if (next) {
@@ -60,14 +79,16 @@ function App() {
   };
 
   const openAddSelector = () => {
-    setSelectedEmployee(null);
-    setSelectedComputer(null);
+    resetSelections();
+    setUpdateView(UPDATE_VIEWS.NONE);
     setAddView((current) =>
       current === ADD_VIEWS.SELECTOR ? ADD_VIEWS.NONE : ADD_VIEWS.SELECTOR
     );
   };
 
   const handleSelectAdd = (type) => {
+    resetSelections();
+    setUpdateView(UPDATE_VIEWS.NONE);
     if (type === ADD_VIEWS.EMPLOYEE) {
       setSelected("Employee");
       setAddView(ADD_VIEWS.EMPLOYEE);
@@ -75,13 +96,11 @@ function App() {
       setSelected("Computers");
       setAddView(ADD_VIEWS.COMPUTER);
     }
-    setSelectedEmployee(null);
-    setSelectedComputer(null);
   };
 
   const handleOpenAssign = () => {
-    setSelectedEmployee(null);
-    setSelectedComputer(null);
+    resetSelections();
+    setUpdateView(UPDATE_VIEWS.NONE);
     setAddView(ADD_VIEWS.ASSIGN);
   };
 
@@ -89,7 +108,8 @@ function App() {
     setAddView(ADD_VIEWS.NONE);
   };
 
-  const returnToSelector = () => {
+  const returnToAddSelector = () => {
+    resetSelections();
     setAddView(ADD_VIEWS.SELECTOR);
   };
 
@@ -99,6 +119,37 @@ function App() {
       type: "success",
       message: "Assignment created successfully.",
     });
+    setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
+  };
+
+  const openUpdateSelector = () => {
+    resetSelections();
+    setAddView(ADD_VIEWS.NONE);
+    setUpdateView((current) =>
+      current === UPDATE_VIEWS.SELECTOR ? UPDATE_VIEWS.NONE : UPDATE_VIEWS.SELECTOR
+    );
+  };
+
+  const handleSelectUpdate = (view) => {
+    resetSelections();
+    setAddView(ADD_VIEWS.NONE);
+    setUpdateView(view);
+  };
+
+  const handleOpenUpdateAssignment = () => {
+    resetSelections();
+    setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.ASSIGNMENT);
+  };
+
+  const closeUpdateView = () => {
+    setUpdateView(UPDATE_VIEWS.NONE);
+  };
+
+  const returnToUpdateSelector = () => {
+    resetSelections();
+    setUpdateView(UPDATE_VIEWS.SELECTOR);
   };
 
   const handleEmployeeCreated = (employee) => {
@@ -117,6 +168,21 @@ function App() {
     });
   };
 
+  const handleEmployeeUpdated = (payload) => {
+    const updated = payload?.record;
+    if (updated) {
+      setSelected("Employee");
+      setNewEmployeeEvent({ employee: updated, ts: Date.now() });
+    }
+    resetSelections();
+    setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
+    setToast({
+      id: Date.now(),
+      type: "success",
+      message: "Employee updated successfully.",
+    });
+  };
   const handleComputerCreated = (computer) => {
     setSelected("Computers");
     setAddView(ADD_VIEWS.NONE);
@@ -130,6 +196,42 @@ function App() {
     });
   };
 
+  const handleComputerUpdated = (payload) => {
+    const updated = payload?.record;
+    if (updated) {
+      setSelected("Computers");
+      setNewComputerEvent({ computer: updated, ts: Date.now() });
+    }
+    resetSelections();
+    setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
+    setToast({
+      id: Date.now(),
+      type: "success",
+      message: "Computer updated successfully.",
+    });
+  };
+
+  const handleAssignmentUpdated = (payload) => {
+    const summary = payload?.summary;
+    const employee = summary?.employee;
+    const computer = summary?.computer;
+    if (employee) {
+      setNewEmployeeEvent({ employee, ts: Date.now() });
+    }
+    if (computer) {
+      setNewComputerEvent({ computer, ts: Date.now() });
+    }
+    const message = computer
+      ? "Assignment updated successfully."
+      : "Computer unassigned successfully.";
+    setToast({
+      id: Date.now(),
+      type: "success",
+      message,
+    });
+  };
+
   useEffect(() => {
     if (!toast) {
       return undefined;
@@ -140,27 +242,29 @@ function App() {
 
   const handleEmployeeClick = (employee) => {
     setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
     setSelectedEmployee(employee.id);
     setSelectedComputer(null);
   };
 
   const handleComputerClick = (computer) => {
     setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
     setSelectedComputer(computer.id);
     setSelectedEmployee(null);
   };
 
   const handleBackToList = () => {
-    setSelectedEmployee(null);
-    setSelectedComputer(null);
+    resetSelections();
     setAddView(ADD_VIEWS.NONE);
+    setUpdateView(UPDATE_VIEWS.NONE);
   };
 
   const handleFilterSelect = (value) => {
     setSelected(value);
+    resetSelections();
     setAddView(ADD_VIEWS.NONE);
-    setSelectedEmployee(null);
-    setSelectedComputer(null);
+    setUpdateView(UPDATE_VIEWS.NONE);
   };
 
   const searchPlaceholder =
@@ -175,15 +279,48 @@ function App() {
   ) : null;
 
   let mainContent = null;
-  if (addView === ADD_VIEWS.SELECTOR) {
+
+  if (updateView === UPDATE_VIEWS.SELECTOR) {
+    mainContent = (
+      <UpdateSelector
+        onSelectEmployee={() => handleSelectUpdate(UPDATE_VIEWS.EMPLOYEE)}
+        onSelectComputer={() => handleSelectUpdate(UPDATE_VIEWS.COMPUTER)}
+        onOpenAssignment={handleOpenUpdateAssignment}
+      />
+    );
+  } else if (updateView === UPDATE_VIEWS.EMPLOYEE) {
+    mainContent = (
+      <UpdateEmployeePanel
+        onBack={returnToUpdateSelector}
+        onSuccess={handleEmployeeUpdated}
+      />
+    );
+  } else if (updateView === UPDATE_VIEWS.COMPUTER) {
+    mainContent = (
+      <UpdateComputerPanel
+        onBack={returnToUpdateSelector}
+        onSuccess={handleComputerUpdated}
+      />
+    );
+  } else if (updateView === UPDATE_VIEWS.ASSIGNMENT) {
+    mainContent = (
+      <UpdateAssignmentPanel
+        onBack={returnToUpdateSelector}
+        onSuccess={handleAssignmentUpdated}
+      />
+    );
+  } else if (addView === ADD_VIEWS.SELECTOR) {
     mainContent = (
       <div className="flex h-full w-full items-center justify-center px-4 py-12">
         <div className="relative w-full max-w-3xl rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
           <div className="absolute -left-6 top-1/2 hidden h-28 w-5 -translate-y-1/2 rounded-r-3xl border border-gray-200 bg-white lg:block" />
           <div className="absolute -right-6 top-1/2 hidden h-28 w-5 -translate-y-1/2 rounded-l-3xl border border-gray-200 bg-white lg:block" />
           <div className="rounded-2xl border border-gray-100 bg-gray-50 px-10 py-8">
-            <h2 className="text-center text-lg font-semibold text-gray-800">What would you like to add?</h2>
-            <p className="mt-2 text-center text-sm text-gray-500">Please select the correct form</p>
+            <span className="text-xs font-semibold uppercase tracking-[0.6em] text-yellow-500">
+              Add
+            </span>
+            <h2 className="mt-3 text-center text-lg font-semibold text-gray-800">What would you like to add?</h2>
+            <p className="mt-1 text-center text-sm text-gray-500">Please select the correct form.</p>
             <div className="mt-8 grid gap-6 md:grid-cols-2">
               <button
                 type="button"
@@ -234,7 +371,7 @@ function App() {
   } else if (addView === ADD_VIEWS.ASSIGN) {
     mainContent = (
       <AssignPanel
-        onClose={returnToSelector}
+        onClose={returnToAddSelector}
         onAssignmentCreated={handleAssignmentCreated}
       />
     );
@@ -279,7 +416,11 @@ function App() {
   return (
     <>
       <div className="flex min-h-screen bg-white">
-        <Sidebar onToggleSearch={handleToggleSearch} onAddClick={openAddSelector} />
+        <Sidebar
+          onToggleSearch={handleToggleSearch}
+          onAddClick={openAddSelector}
+          onUpdateClick={openUpdateSelector}
+        />
         <main className="flex-1 ml-20 flex flex-col">
           <Header />
           <FilterBar selected={selected} onSelect={handleFilterSelect} />
@@ -294,3 +435,23 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

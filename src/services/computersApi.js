@@ -22,6 +22,13 @@ export const searchComputers = ({
 export const createComputer = (computer) =>
   apiClient.post("/computers", computer);
 
+// Actualizar computadora
+export const updateComputer = (id, computer) =>
+  apiClient.put(`/computers/${id}`, computer);
+
+// Obtener computadora por ID
+export const getComputerById = (id) => apiClient.get(`/computers/${id}`);
+
 // Lista completa (no paginada)
 export const listAllComputers = () => apiClient.get("/computers");
 

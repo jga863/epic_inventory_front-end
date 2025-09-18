@@ -22,6 +22,10 @@ export const getEmployeeSummary = (id) => apiClient.get(`/summary/${id}`);
 export const createEmployee = (employee) =>
   apiClient.post("/employees", employee);
 
+// Actualizar un empleado
+export const updateEmployee = (id, employee) =>
+  apiClient.put(`/employees/${id}`, employee);
+
 // Lista completa (no paginada)
 // Trae todos los empleados recorriendo todas las paginas
 export const listAllEmployees = async () => {
