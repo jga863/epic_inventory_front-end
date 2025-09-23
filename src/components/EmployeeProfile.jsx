@@ -3,6 +3,8 @@ import { getEmployeeSummary } from '../services/employeeApi';
 import epicEmployee from '../assets/epic_employee.png';
 import epicComputer from '../assets/epic_computer.png';
 
+// TODO: RENDIMIENTO - Agregar React.memo para evitar re-renders innecesarios
+// Similar a ComputerProfile, este componente necesita memoización
 const EmployeeProfile = ({ employeeId, onBack }) => {
   const [employeeData, setEmployeeData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ const EmployeeProfile = ({ employeeId, onBack }) => {
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="flex items-center text-yellow-600 hover:text-yellow-800 mb-4 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+            className="flex items-center text-yellow-700 hover:text-yellow-800 mb-4 px-4 py-2 rounded-lg border border-yellow-400 bg-white hover:bg-yellow-50 transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -58,7 +60,7 @@ const EmployeeProfile = ({ employeeId, onBack }) => {
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="flex items-center text-yellow-600 hover:text-yellow-800 mb-4 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+            className="flex items-center text-yellow-700 hover:text-yellow-800 mb-4 px-4 py-2 rounded-lg border border-yellow-400 bg-white hover:bg-yellow-50 transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -80,7 +82,7 @@ const EmployeeProfile = ({ employeeId, onBack }) => {
         <div className="mb-6">
           <button
             onClick={onBack}
-            className="flex items-center text-yellow-600 hover:text-yellow-800 mb-4 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+            className="flex items-center text-yellow-700 hover:text-yellow-800 mb-4 px-4 py-2 rounded-lg border border-yellow-400 bg-white hover:bg-yellow-50 transition-colors"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -104,7 +106,7 @@ const EmployeeProfile = ({ employeeId, onBack }) => {
       <div className="mb-6">
         <button
           onClick={onBack}
-          className="flex items-center text-yellow-600 hover:text-yellow-800 mb-4 px-4 py-2 rounded-lg hover:bg-blue-50 transition-colors"
+          className="flex items-center text-yellow-700 hover:text-yellow-800 mb-4 px-4 py-2 rounded-lg border border-yellow-400 bg-white hover:bg-yellow-50 transition-colors"
         >
           <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -114,28 +116,28 @@ const EmployeeProfile = ({ employeeId, onBack }) => {
       </div>
 
       {/* Tarjeta principal del empleado */}
-      <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="bg-white rounded-lg shadow-lg overflow-hidden mx-4 md:mx-0">
         {/* Header con foto y nombre */}
         <div className="bg-gradient-to-r from-yellow-600 to-yellow-50 px-8 py-6 text-white">
           <div className="flex items-center">
-            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mr-6">
-              <img 
-                src={epicEmployee} 
-                alt="Employee" 
-                className="w-16 h-16 object-contain"
+            <div className="w-16 h-16 md:w-24 md:h-24 bg-white rounded-full flex items-center justify-center mr-4 md:mr-6">
+              <img
+                src={epicEmployee}
+                alt="Employee"
+                className="w-12 h-12 md:w-16 md:h-16 object-contain"
               />
             </div>
             <div>
-              <h1 className="text-3xl font-bold">{employee.fullName || 'Name not available'}</h1>
-              <p className="text-blue-100 text-lg">{employee.department || 'Department not specified'}</p>
-              <p className="text-blue-200">ID: {employee.id}</p>
+              <h1 className="text-xl md:text-3xl font-bold">{employee.fullName || 'Name not available'}</h1>
+              <p className="text-blue-100 text-sm md:text-lg">{employee.department || 'Department not specified'}</p>
+              <p className="text-blue-200 text-sm">ID: {employee.id}</p>
             </div>
           </div>
         </div>
 
         {/* Detailed Information */}
-        <div className="p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="p-4 md:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-8">
             {/* Personal Information */}
             <div>
               <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
@@ -193,8 +195,8 @@ const EmployeeProfile = ({ employeeId, onBack }) => {
 
           {/* Assigned Computer Section */}
           {computer ? (
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+            <div className="mt-4 md:mt-8">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
                 Assigned Computer
               </h2>
               <div className="bg-gray-50 rounded-lg p-6">
@@ -210,7 +212,7 @@ const EmployeeProfile = ({ employeeId, onBack }) => {
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">
                       {computer.name || 'Unnamed Computer'}
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="font-medium text-gray-600">Model:</span>
                         <span className="ml-2 text-gray-800">{computer.model || '—'}</span>
@@ -258,12 +260,12 @@ const EmployeeProfile = ({ employeeId, onBack }) => {
 
           {/* Assignment Information */}
           {assignment && (
-            <div className="mt-8">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+            <div className="mt-4 md:mt-8">
+              <h2 className="text-lg md:text-xl font-semibold text-gray-800 mb-4 border-b border-gray-200 pb-2">
                 Assignment Information
               </h2>
               <div className="bg-blue-50 rounded-lg p-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                   <div>
                     <span className="font-medium text-gray-600">Assignment ID:</span>
                     <span className="ml-2 text-gray-800">{assignment.id || '—'}</span>

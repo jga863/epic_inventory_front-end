@@ -49,3 +49,7 @@ export const getByReplacePriority = (priority) =>
 // Obtener resumen de computadora con empleado asignado
 export const getComputerSummary = (id) =>
   apiClient.get(`/summary/computer/${id}`);
+
+// Eliminar una computadora
+export const deleteComputer = (id) =>
+  apiClient.delete(`/computers/${id}`);

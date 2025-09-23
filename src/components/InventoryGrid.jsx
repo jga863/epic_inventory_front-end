@@ -7,6 +7,8 @@ import { listEmployeesPage } from "../services/employeeApi";
 import epicComputer from "../assets/epic_computer.png";
 import epicEmployee from "../assets/epic_employee.png";
 
+// TODO: RENDIMIENTO - Implementar lazy loading para componentes pesados
+// Usar React.lazy para InventoryCard y otros componentes que no se cargan inicialmente
 const PAGE_SIZE = 12;
 
 const mapEmployeeToGridItem = (employee) => {
@@ -45,6 +47,10 @@ const mapComputerToGridItem = (computer) => {
   };
 };
 
+// TODO: RENDIMIENTO - Agregar React.memo y useCallback para optimización
+// Envolver componente con React.memo y usar useCallback para onClick handlers
+// TODO: RENDIMIENTO - Implementar virtualización para listas grandes
+// Usar react-window para renderizar solo elementos visibles cuando items.length > 100
 const InventoryGrid = ({
   category = "Computers",
   onEmployeeClick,
@@ -82,6 +88,8 @@ const InventoryGrid = ({
     Survey: "/survey.png",
   };
 
+  // TODO: RENDIMIENTO - Optimizar useEffect con useMemo para cálculos costosos
+  // Los efectos podrían combinarse y usar useMemo para normalizedSearch y imageMap
   useEffect(() => {
     const categoryChanged = previousCategory.current !== category;
     const searchChanged = previousSearch.current !== normalizedSearch;
@@ -216,7 +224,7 @@ const InventoryGrid = ({
     : "mb-3 flex items-center gap-4 justify-end";
 
   return (
-    <div className="px-8 py-4 text-gray-800">
+    <div className="px-4 md:px-8 py-4 text-gray-800">
       <div className={topBarClass}>
         {isSearchVisible && (
           <div className="flex-1">
@@ -252,7 +260,7 @@ const InventoryGrid = ({
             : "No items to display."}
         </div>
       ) : (
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 md:gap-4">
           {items.map((item) => (
             <InventoryCard
               key={item.id ?? item.name}

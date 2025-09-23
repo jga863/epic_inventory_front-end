@@ -173,15 +173,15 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
   const submitLabel = isSubmitting ? "Saving..." : "Add employee";
 
   return (
-    <section className="px-8 pb-12 text-gray-800">
-      <div className="mx-auto w-full max-w-4xl mt-6">
+    <section className="px-4 md:px-8 pb-12 text-gray-800">
+      <div className="mx-auto w-full max-w-4xl mt-4 md:mt-6">
         <header className="border-b border-gray-200 pb-4 mb-6">
-          <h2 className="text-xl font-semibold text-gray-800">Add employee</h2>
+          <h2 className="text-lg md:text-xl font-semibold text-gray-800">Add employee</h2>
           <p className="mt-1 text-sm text-gray-500">
             Complete the information to add a new team member.
           </p>
         </header>
-        <form className="space-y-6" onSubmit={handleSubmit} noValidate>
+        <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit} noValidate>
           {formError && (
             <div className="rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
               {formError}
@@ -195,7 +195,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
               <input
                 id="firstName"
                 name="firstName"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+                className="mt-1 w-full rounded border border-gray-300 px-4 py-3 text-base focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
                 value={form.firstName}
                 onChange={handleChange("firstName")}
                 disabled={isSubmitting}
@@ -211,7 +211,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
               <input
                 id="lastName"
                 name="lastName"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+                className="mt-1 w-full rounded border border-gray-300 px-4 py-3 text-base focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
                 value={form.lastName}
                 onChange={handleChange("lastName")}
                 disabled={isSubmitting}
@@ -228,7 +228,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                 id="email"
                 name="email"
                 type="email"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+                className="mt-1 w-full rounded border border-gray-300 px-4 py-3 text-base focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
                 value={form.email}
                 onChange={handleChange("email")}
                 disabled={isSubmitting}
@@ -244,7 +244,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
               <select
                 id="office"
                 name="office"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+                className="mt-1 w-full rounded border border-gray-300 px-4 py-3 text-base focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
                 value={form.office}
                 onChange={handleChange("office")}
                 disabled={isSubmitting}
@@ -267,7 +267,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
               <input
                 id="department"
                 name="department"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+                className="mt-1 w-full rounded border border-gray-300 px-4 py-3 text-base focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
                 value={form.department}
                 onChange={handleChange("department")}
                 disabled={isSubmitting}
@@ -283,7 +283,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
               <select
                 id="status"
                 name="status"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+                className="mt-1 w-full rounded border border-gray-300 px-4 py-3 text-base focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
                 value={form.status}
                 onChange={handleChange("status")}
                 disabled={isSubmitting}
@@ -302,7 +302,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
               <input
                 id="extension"
                 name="extension"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+                className="mt-1 w-full rounded border border-gray-300 px-4 py-3 text-base focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
                 value={form.extension}
                 onChange={handleChange("extension")}
                 disabled={isSubmitting}
@@ -318,7 +318,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
               <input
                 id="cellPhone"
                 name="cellPhone"
-                className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
+                className="mt-1 w-full rounded border border-gray-300 px-4 py-3 text-base focus:border-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-200"
                 value={form.cellPhone}
                 onChange={handleChange("cellPhone")}
                 disabled={isSubmitting}
@@ -339,7 +339,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
             </button>
             <button
               type="submit"
-              className="rounded bg-yellow-400 px-5 py-2 text-sm font-semibold text-yellow-900 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 disabled:opacity-50"
+              className="rounded bg-yellow-400 px-6 py-3 text-base font-semibold text-yellow-900 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-200 disabled:opacity-50"
               disabled={isSubmitting}
             >
               {submitLabel}

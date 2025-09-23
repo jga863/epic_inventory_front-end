@@ -1,3 +1,7 @@
+// TODO: ARQUITECTURA - Dividir App.jsx en componentes más pequeños y hooks personalizados
+// Este componente es demasiado grande (539 líneas). Extraer lógica de navegación a useAppNavigation hook
+// y mover constantes a src/constants/views.js para mejor organización.
+
 import { useEffect, useState } from "react";
 import Sidebar from "./components/Sidebar";
 import Header from "./components/Header";
@@ -13,10 +17,12 @@ import UpdateEmployeePanel from "./components/UpdateEmployeePanel";
 import UpdateComputerPanel from "./components/UpdateComputerPanel";
 import UpdateAssignmentPanel from "./components/UpdateAssignmentPanel";
 import DeleteSelector from "./components/DeleteSelector";
-import DeletePlaceholder from "./components/DeletePlaceholder";
+import DeleteEmployeePanel from "./components/DeleteEmployeePanel";
+import DeleteComputerPanel from "./components/DeleteComputerPanel";
 import employeeChoiceIllustration from "./assets/epic_employee.png";
 import computerChoiceIllustration from "./assets/epic_computer.png";
 
+// TODO: ARQUITECTURA - Mover constantes a archivo separado src/constants/views.js
 const ADD_VIEWS = {
   NONE: "none",
   SELECTOR: "selector",
@@ -40,7 +46,10 @@ const DELETE_VIEWS = {
   COMPUTER: "computer",
 };
 
+// TODO: ARQUITECTURA - Implementar Context API o Zustand para manejar estado global
+// Reemplazar múltiples useState con un reducer o estado global para mejor mantenibilidad
 function App() {
+  // TODO: ARQUITECTURA - Consolidar estados relacionados en un objeto de estado único
   const [selected, setSelected] = useState("Computers");
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [selectedComputer, setSelectedComputer] = useState(null);
@@ -53,7 +62,10 @@ function App() {
   const [newEmployeeEvent, setNewEmployeeEvent] = useState(null);
   const [newComputerEvent, setNewComputerEvent] = useState(null);
   const [toast, setToast] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // TODO: ARQUITECTURA - Extraer funciones de manejo de estado a hooks personalizados
+  // Estas funciones podrían ir en useAppNavigation o useViewManagement
   const resetSelections = () => {
     setSelectedEmployee(null);
     setSelectedComputer(null);
@@ -270,6 +282,24 @@ function App() {
     });
   };
 
+  const handleEmployeeDeleted = () => {
+    setToast({
+      id: Date.now(),
+      type: "success",
+      message: "Employee deleted successfully.",
+    });
+    setDeleteView(DELETE_VIEWS.NONE);
+  };
+
+  const handleComputerDeleted = () => {
+    setToast({
+      id: Date.now(),
+      type: "success",
+      message: "Computer deleted successfully.",
+    });
+    setDeleteView(DELETE_VIEWS.NONE);
+  };
+
   useEffect(() => {
     if (!toast) {
       return undefined;
@@ -309,6 +339,10 @@ function App() {
     setDeleteView(DELETE_VIEWS.NONE);
   };
 
+  const handleSidebarToggle = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
   const searchPlaceholder =
     selected === "Employee"
       ? "Search employee by name"
@@ -320,6 +354,8 @@ function App() {
     </div>
   ) : null;
 
+  // TODO: ARQUITECTURA - Extraer lógica de renderizado condicional a componente separado
+  // Este bloque if-else gigante debería ser un componente <ViewRouter> que maneje la navegación
   let mainContent = null;
 
   if (updateView === UPDATE_VIEWS.SELECTOR) {
@@ -360,18 +396,16 @@ function App() {
     );
   } else if (deleteView === DELETE_VIEWS.EMPLOYEE) {
     mainContent = (
-      <DeletePlaceholder
-        title="Delete Employee"
-        description="Select an employee to delete from the system."
+      <DeleteEmployeePanel
         onBack={returnToDeleteSelector}
+        onSuccess={handleEmployeeDeleted}
       />
     );
   } else if (deleteView === DELETE_VIEWS.COMPUTER) {
     mainContent = (
-      <DeletePlaceholder
-        title="Delete Computer"
-        description="Select a computer to delete from the system."
+      <DeleteComputerPanel
         onBack={returnToDeleteSelector}
+        onSuccess={handleComputerDeleted}
       />
     );
   } else if (addView === ADD_VIEWS.SELECTOR) {
@@ -482,13 +516,18 @@ function App() {
     <>
       <div className="flex min-h-screen bg-white">
         <Sidebar
+          isOpen={isSidebarOpen}
+          onToggle={handleSidebarToggle}
           onToggleSearch={handleToggleSearch}
           onAddClick={openAddSelector}
           onUpdateClick={openUpdateSelector}
           onDeleteClick={openDeleteSelector}
         />
-        <main className="flex-1 ml-20 flex flex-col">
-          <Header />
+        <main className={`
+          flex-1 flex flex-col transition-all duration-300 ease-in-out
+          ${isSidebarOpen ? 'ml-20' : 'ml-0'}
+        `}>
+          <Header onMenuClick={handleSidebarToggle} />
           <FilterBar selected={selected} onSelect={handleFilterSelect} />
           <div className="flex-1 overflow-auto">
             {mainContent}

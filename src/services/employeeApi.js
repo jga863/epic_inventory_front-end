@@ -26,6 +26,10 @@ export const createEmployee = (employee) =>
 export const updateEmployee = (id, employee) =>
   apiClient.put(`/employees/${id}`, employee);
 
+// Eliminar un empleado
+export const deleteEmployee = (id) =>
+  apiClient.delete(`/employees/${id}`);
+
 // Lista completa (no paginada)
 // Trae todos los empleados recorriendo todas las paginas
 export const listAllEmployees = async () => {
