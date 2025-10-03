@@ -10,7 +10,7 @@ const EmployeeFormFields = ({
   statusOptions
 }) => {
   return (
-    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 text-gray-500">
       <FormField
         label="First name"
         name="firstName"

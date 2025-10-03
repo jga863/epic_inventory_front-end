@@ -14,10 +14,12 @@ function buildUrl(path, params) {
 
 async function request(path, { method = "GET", params, body, headers } = {}) {
   const requestUrl = buildUrl(path, params);
+  const authToken = sessionStorage.getItem('authToken');
   const init = {
     method,
     headers: {
       Accept: "application/json",
+      ...(authToken && { Authorization: authToken }),
       ...headers,
     },
   };

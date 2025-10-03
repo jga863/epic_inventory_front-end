@@ -8,9 +8,11 @@ import {
 } from "react-icons/fa";
 import SidebarButton from "./SidebarButton";
 import useNavigation from "../../../hooks/useNavigation";
+import { useAuth } from "../../../context/authContext";
 
 const Sidebar = ({ isOpen, onToggle }) => {
   const { toggleSearch, openAddSelector, openUpdateSelector, openDeleteSelector } = useNavigation();
+  const { hasRole } = useAuth();
 
   return (
     <aside
@@ -35,9 +37,15 @@ const Sidebar = ({ isOpen, onToggle }) => {
       {/* Navegación */}
       <nav className={`flex flex-col gap-5 w-full ${isOpen ? "px-3" : "px-1"}`}>
         <SidebarButton icon={<FaSearch />} label="Search" onClick={toggleSearch} />
-        <SidebarButton icon={<FaPlus />} label="Add" onClick={openAddSelector} />
-        <SidebarButton icon={<FaEdit />} label="Update" onClick={openUpdateSelector} />
-        <SidebarButton icon={<FaTrash />} label="Delete" onClick={openDeleteSelector} />
+        {(hasRole('ROLE_MANAGER') || hasRole('ROLE_ADMIN')) && (
+          <SidebarButton icon={<FaPlus />} label="Add" onClick={openAddSelector} />
+        )}
+        {(hasRole('ROLE_MANAGER') || hasRole('ROLE_ADMIN')) && (
+          <SidebarButton icon={<FaEdit />} label="Update" onClick={openUpdateSelector} />
+        )}
+        {hasRole('ROLE_ADMIN') && (
+          <SidebarButton icon={<FaTrash />} label="Delete" onClick={openDeleteSelector} />
+        )}
         <SidebarButton icon={<FaChartBar />} label="Reports" />
       </nav>
     </aside>
