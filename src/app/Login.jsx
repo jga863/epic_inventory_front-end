@@ -1,14 +1,23 @@
 import React, { useState } from 'react';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/authContext';
 import { useContext } from 'react';
 import { UIContext } from '../context/uiContext';
+import logo from '../assets/Epic-Logo-square.png';
+import AppButton from '../shared/components/AppButton';
+import AppInput from '../shared/forms/AppInput';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const navigate = useNavigate();
+  const { isAuthenticated, login } = useAuth();
   const { showToast } = useContext(UIContext);
+
+  if (isAuthenticated) {
+    return <Navigate to="/inventory" replace />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -18,65 +27,56 @@ const Login = () => {
       setError(result.error);
     } else {
       showToast('Login successful', 'success');
+      navigate('/inventory', { replace: true });
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
+    <div className="app-shell flex min-h-screen items-center justify-center px-4 py-12 sm:px-6 lg:px-8">
+      <div className="app-card max-w-md w-full space-y-8 p-8 md:p-10">
         <div>
-          <img className="mx-auto h-30 w-auto" src="/src/assets/Epic-Logo-square.png" alt="Logo" />
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <img className="mx-auto h-30 w-auto" src={logo} alt="Logo" />
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-[var(--color-text)]">
             Sign in to the Epic Inventory
           </h2>
+          <p className="mt-2 text-center text-sm text-[var(--color-text-muted)]">
+            Access inventory modules with your current credentials.
+          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="username" className="sr-only">
-                Username
-              </label>
-              <input
-                id="username"
-                name="username"
-                type="text"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+          <div className="space-y-4">
+            <AppInput
+              id="username"
+              name="username"
+              type="text"
+              label="Username"
+              required
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <AppInput
+              id="password"
+              name="password"
+              type="password"
+              label="Password"
+              required
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </div>
 
           {error && (
-            <div className="text-red-600 text-sm text-center">
+            <div className="rounded-2xl border px-3 py-2 text-center text-sm" style={{ borderColor: 'var(--color-danger)', background: 'var(--color-danger-soft)', color: 'var(--color-danger)' }}>
               {error}
             </div>
           )}
 
           <div>
-            <button
-              type="submit"
-              className="!bg-yellow-500 !hover:bg-yellow-700 !text-white w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 !focus:ring-yellow-500"
-            >
+            <AppButton type="submit" block size="lg">
               Sign in
-            </button>
+            </AppButton>
           </div>
         </form>
       </div>
